@@ -82,7 +82,8 @@ class Rumus
                 'normalization'=>$this->alternatif[$index]['normalization'],
                 'values'=>$this->alternatif[$index]['value'],
                 'wpm'=>$this->alternatif[$index]['wpm'],
-                'score'=>$this->alternatif[$index]['score']
+                'score'=>$this->alternatif[$index]['score'],
+                'id'=>$this->alternatif[$index]['id']
             ];
         }
         $this->alternatif = $newarr;
