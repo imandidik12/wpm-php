@@ -1,5 +1,5 @@
 {
-    "name": "0.0.1/try-make-package",
+    "name": "imandidik/wpm-php",
     "description": "just a test",
     "require": {
         "php": ">=7.2",
@@ -8,8 +8,8 @@
     },
     "authors": [
         {
-            "name": "hanlei",
-            "email": "nicehanlei@163.com"
+            "name": "imandidikr",
+            "email": "imandidikr@gmail.com"
         }
     ],
     "minimum-stability": "stable",

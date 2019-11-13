@@ -20,7 +20,6 @@ class Rumus
         $this->findminmax();
         $this->findNormalization();
         $this->findwpm();
-        $this->get_formatted();
     }
     final public function set_criterias() : void {
 
