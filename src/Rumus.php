@@ -47,7 +47,7 @@ class Rumus
 
     }
 
-    final public function set_normalize_preferences(Collection $collection ):void{
+    final public function set_normalize_preferences( $collection ):void{
         $total = $collection->reduce(static function($reducer, $entry){
             return $entry + $reducer;
         },0);
@@ -97,7 +97,7 @@ class Rumus
         }
     }
 
-    final public function get_formatted():Collection{
+    final public function get_formatted(){
 
         $s = $this->formatted_s;
         $toreturn = [];
