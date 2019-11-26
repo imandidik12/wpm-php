@@ -2,7 +2,9 @@
 
 This is php package for calculating Weigthed product model for php.
 
-#####Please use this if you already know what WPM.
+<h1>
+Please use this if you already know what WPM.
+</h1>
 
 How to use : 
 <ol>
