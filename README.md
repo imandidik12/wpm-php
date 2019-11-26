@@ -26,4 +26,10 @@ Make the recommedation preferences values for all the alternatives
 <br>
 <code>$wp = [5, 3, 4, 4, 2];</code>
 </li>
+<li>
+<strong>
+Optioanl : you can set the costly recommedation preferences 
+</strong>
+<code>$cost = [1,5];</code>
+</li>
 </ol> 
