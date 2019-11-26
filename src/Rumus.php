@@ -56,6 +56,7 @@ class Rumus
         $preferences->normalized = $collection->map(static function ($entry) use ($total){
             return $entry / $total;
         });
+        $preferences->unormalized = $collection;
         $this->preferences = $preferences;
     }
 

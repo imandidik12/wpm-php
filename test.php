@@ -281,7 +281,7 @@ $bobot = [5,10,40,20,10];
 $cost = [1,2];
 $wpm = new Rumus($dataset, $bobot, $cost);
 $res = $wpm->get_formatted();
-dd($wpm->preferences->normalized);
+dd($res->sortbybest());
 //$wr = [5, 2, 4, 4, .5];
 //
 //$dataset = [
