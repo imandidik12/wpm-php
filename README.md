@@ -60,3 +60,8 @@ Return collections of calculated of all the alternatives with best choised in as
 </tr>
 </tbody>
 </table>
+
+<p>Reference : </p>
+<cite >
+Munthe, Brendy, Faizatul Amalia, & Imam Cholissodin. " Pengembangan Sistem Informasi Penilaian dan Evaluasi Kinerja Karyawan Dengan Metode Weighted Product Berbasis Web (Studi Kasus: UB Guest House)." Jurnal Pengembangan Teknologi Informasi dan Ilmu Komputer [Online], 3.9 (2019): 9095-9104. Web. 26 Nov. 2019
+</cite>
