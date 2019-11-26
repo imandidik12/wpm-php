@@ -1,11 +1,13 @@
 {
     "name": "imandidik/wpm-php",
-    "description": "just a test",
+    "license": "MIT",
+    "description": "Weigthed Product Algorithm in PHP PLEASE USE THIS PACKAGE IF U ALREADY KNOW WPM",
     "require": {
         "php": ">=7.2",
         "monolog/monolog": "2.0.*",
-        "lodash-php/lodash-php": "^0.0.6"
+        "tightenco/collect": "6.5.2"
     },
+    "version": "0.0.1",
     "authors": [
         {
             "name": "imandidikr",

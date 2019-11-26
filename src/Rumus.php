@@ -2,107 +2,127 @@
 
 
 namespace Rumus;
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-use function _\sortBy;
-use function _\map;
-use function _\reduce;
-use function Couchbase\defaultDecoder;
-
+use stdClass;
+use Tightenco\Collect\Support\Collection;
 class Rumus
 {
-    private $alternatif;
-    private $referensiproduk;
-    private $criterias;
+    public $preferences;
+    public $alternatives;
+    public $benefical_index;
 
-    public function __construct(array $alternatif, array $referensiproduk)
+    public $s_vector;
+    public $s_total;
+
+    public $v_vector;
+
+    public $formatted_v;
+    public $formatted_s;
+
+
+    public function __construct(array $alternatif, array $preferences, array $benefical_index = [])
     {
-        $this->alternatif = $alternatif;
-        foreach ($this->alternatif as $index =>$_alternatif){
-            if (! isset($_alternatif['id'])){
-                $this->alternatif[$index]['id'] = 'A'.($index+1);
+        $alternatif = collect($alternatif)->map(static function( array $entry, $index) use ($preferences){
+            if (count($entry)!== count($preferences)){
+                dd('Preferences must be same as entry criterias at alternative : '.$index);
             }
-        }
-        $this->referensiproduk = $referensiproduk;
-        $this->set_criterias();
-        $this->findminmax();
-        $this->findNormalization();
-        $this->findwpm();
-        $this->get_formatted();
-    }
-    final public function set_criterias() : void {
+            $obj = new stdClass();
+            $obj->criterias = $entry;
+            return $obj;
+        });
 
-        foreach ($this->referensiproduk as $index =>$value){
-            foreach ($this->alternatif as $index1=> $alternatif){
-                $this->criterias[$index]['values'][] = $alternatif[$index]['value'];
-                $this->criterias[$index]['benefical'] = $alternatif[$index]['benefical'];
-            }
-        }
-    }
-    final public function findminmax() : void {
-        foreach ($this->criterias as $index => $criteria){
-            $sorted = sortBy($criteria['values'],[
-                static function ($item){
-                    return $item;
-                }
-            ]);
-            $this->criterias[$index]['min'] = $sorted[0];
-            $this->criterias[$index]['max'] = $sorted[count($sorted)-1];
-        }
-    }
-    final public function findNormalization():void{
-        $this->criterias = map($this->criterias,
-            static function ($item){
-                $operations = $item['benefical'] ?  $item['max'] : $item['min'];
-                $benefical = $item['benefical'];
-                $item['normalization'] = map($item['values'], static function ($item) use ($operations, $benefical){
-                    if ($item<= 1){
-                        return (float) number_format((float)$item, 4, '.', '');
-                    }
-                    if ($benefical){
-                        return (float) number_format((float)($item / $operations), 4, '.', '');
 
-                    }
-                    return(float) number_format(($operations / $item), 4, '.', '');
-                });
-                $values = $item['values'];
-                $item['values'] = $values;
-                return $item;
-            }
-        );
-    }
-    final public function findwpm():void{
-        $newarr = [];
-        foreach ($this->alternatif as $index=> $alternative){
-            unset($alternative['id']);
-            $this->alternatif[$index]['value'] = map($alternative, static function($item){
-                return $item['value'];
-            });
-            foreach ($this->referensiproduk as $index1=>$value){
-                $this->alternatif[$index]['normalization'][] = ($this->criterias[$index1]['normalization'][$index] );
-                $this->alternatif[$index]['wpm'][] =
-                    (float) number_format((($this->criterias[$index1]['normalization'][$index] ** $value)), 4, '.', '');
+        $this->alternatives = $alternatif;
+        $this->benefical_index = $benefical_index;
+        $this->formatted_s = new stdClass();
+        $this->formatted_v = new stdClass();
 
-            }
-            $this->alternatif[$index]['score'] = reduce($this->alternatif[$index]['wpm'],
-            static function($result , $item){
-                return $result * $item;
-            },1);
-            $newarr[$index] = [
-                'normalization'=>$this->alternatif[$index]['normalization'],
-                'values'=>$this->alternatif[$index]['value'],
-                'wpm'=>$this->alternatif[$index]['wpm'],
-                'score'=>$this->alternatif[$index]['score'],
-                'id'=>$this->alternatif[$index]['id']
-            ];
-        }
-        $this->alternatif = $newarr;
+        $this->set_normalize_preferences(collect($preferences));
+        $this->set_s_vector();
+        $this->set_v_vector();
+
+
     }
-    final public function get_formatted() : array {
-        $A = [];
-        foreach ($this->alternatif as $index=> $alternative){
-            $string = 'A'.($index+1);
-            $A[$string] = $alternative;
+
+    final public function set_normalize_preferences(Collection $collection ):void{
+        $total = $collection->reduce(static function($reducer, $entry){
+            return $entry + $reducer;
+        },0);
+
+        $preferences = new stdClass();
+        $preferences->normalized = $collection->map(static function ($entry) use ($total){
+            return $entry / $total;
+        });
+        $this->preferences = $preferences;
+    }
+
+    final public function set_s_vector(): void {
+        $preferences = $this->preferences->normalized;
+        $benefical =collect($this->benefical_index);
+        $vector = [];
+        foreach ($this->alternatives as $name=> $alternative){
+            $arr = [];
+            $this->formatted_s->$name = new stdClass();
+            foreach ($preferences as $index=>$value){
+                $check = $benefical->first(static function($item) use ($index) {return $index === $item-1; });
+                $val = ($alternative->criterias[$index]) ** ($check?'-'.$value:$value);
+                $arr [] = $val;
+                $Sname = 'S'.($index+1);
+                $this->formatted_s->$name->$Sname = $val;
+            }
+            $vector[]= $arr;
         }
-        return $A;
+        $this->s_vector = $vector;
+    }
+
+    final public function set_v_vector(): void {
+        $s_vector = $this->formatted_s;
+        $vectors = [];
+        $total = 0;
+
+        foreach ($this->alternatives as $name=>$value){
+            $s_vector_total = collect($s_vector->$name)->reduce( static function($reducer, $item){return $item*$reducer;} ,1);
+            $vectors[$name] = $s_vector_total;
+            $total +=$s_vector_total;
+        }
+
+        $this->s_total = $total;
+
+        foreach ($vectors as $index=>$vector){
+            $this->v_vector[$index]['s_score'] = $vector;
+            $this->v_vector[$index]['v_score'] = $vector / $total;
+        }
+    }
+
+    final public function get_formatted():Collection{
+
+        $s = $this->formatted_s;
+        $toreturn = [];
+
+        foreach ($this->alternatives as $name=>$value){
+            $toreturn[$name]['criterias'] = [];
+            foreach ($value->criterias as $index=>$_value ){
+                $string = 'C'.($index+1);
+                $toreturn[$name]['criterias'][$string] = $_value;
+            }
+            $toreturn[$name]['normalized'] = (array) $s->$name;
+            $toreturn[$name]['score'] = $this->v_vector[$name];
+
+        }
+
+        $toreturn = collect($toreturn);
+        Collection::macro('sortbybest', function() use ($toreturn){
+           return $toreturn->sortByDesc(static function($item){
+              return $item['score']['v_score'];
+           });
+        });
+        Collection::macro('sortbyleast', function() use ($toreturn){
+            return $toreturn->sortbybest()->reverse();
+        });
+
+        return $toreturn;
     }
 }
