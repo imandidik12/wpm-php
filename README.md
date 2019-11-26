@@ -32,7 +32,7 @@ Return collections of calculated of all the alternatives
 </tbody>
 </table>
 <h1>
-Methods
+Collection Methods
 </h1>
 <table>
 <thead>
@@ -44,10 +44,18 @@ Methods
 <tbody>
 <tr>
 <td>
-get_formatted
+sortbybest
 </td>
 <td>
-Return collections of calculated of all the alternatives
+Return collections of calculated of all the alternatives with best choised in desc order
+</td>
+</tr>
+<tr>
+<td>
+sortbyleast
+</td>
+<td>
+Return collections of calculated of all the alternatives with best choised in asc order
 </td>
 </tr>
 </tbody>
