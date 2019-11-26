@@ -33,11 +33,9 @@ $dataset3 = [
 ];
 
 $data = [
-    'Bayu'=>$dataset3[0],
-    'Agung'=>$dataset3[1],
-    'Andre'=>$dataset3[2],
-    'Fuad'=>$dataset3[3],
-    'Deni'=>$dataset3[4],
+    'A1'=>$dataset1[0],
+    'A2'=>$dataset2[1],
+    'A3'=>$dataset3[2],
 ];
 $benefical = [];
 $rumus = new Rumus($data, $bobot, $benefical);
