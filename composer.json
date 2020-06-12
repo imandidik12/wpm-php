@@ -1,5 +1,5 @@
 {
-    "name": "imandidik/wpm-php",
+    "name": "ramadhanarsy/wpm-php",
     "license": "MIT",
     "description": "Weigthed Product Algorithm in PHP PLEASE USE THIS PACKAGE IF U ALREADY KNOW WPM",
     "require": {
@@ -10,8 +10,8 @@
     "version": "0.0.1",
     "authors": [
         {
-            "name": "imandidikr",
-            "email": "imandidikr@gmail.com"
+            "name": "ramadhanarsy",
+            "email": "ramadhanarsy@gmail.com"
         }
     ],
     "minimum-stability": "stable",
